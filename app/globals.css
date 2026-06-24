@@ -1,0 +1,152 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f4f6f1;
+  --foreground: #090d1b;
+  --surface: #ffffff;
+  --surface-raised: #fbfcf8;
+  --surface-muted: #eef2ea;
+  --ink-soft: #475569;
+  --collector-red: #ef233c;
+  --collector-yellow: #ffd43b;
+  --collector-blue: #1d4ed8;
+  --collector-green: #009b72;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  width: 100%;
+  min-width: 0;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  min-width: 0;
+  width: 100%;
+  overflow-x: clip;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(90deg, rgba(9, 13, 27, 0.045) 1px, transparent 1px),
+    linear-gradient(rgba(9, 13, 27, 0.035) 1px, transparent 1px),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(238, 242, 234, 0.78));
+  background-size: 40px 40px, 40px 40px, auto;
+}
+
+body::selection {
+  background: rgba(250, 204, 21, 0.45);
+}
+
+a,
+button {
+  outline-offset: 2px;
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid #0088ff;
+  outline-offset: 3px;
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.collector-shell {
+  min-width: 0;
+}
+
+.collector-vault-hero {
+  box-shadow:
+    0 26px 70px rgba(9, 13, 27, 0.13),
+    inset 0 1px 0 rgba(255, 255, 255, 0.92);
+}
+
+.collector-vault-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(110deg, rgba(239, 35, 60, 0.10), transparent 36%),
+    linear-gradient(250deg, rgba(255, 212, 59, 0.22), transparent 42%);
+}
+
+.collector-command-surface {
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(251, 252, 248, 0.92)),
+    linear-gradient(90deg, rgba(239, 35, 60, 0.10), transparent 38%);
+}
+
+.collector-image-fallback {
+  background:
+    linear-gradient(135deg, #090d1b, #1f2937),
+    repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.08) 0 8px, transparent 8px 16px);
+}
+
+.collector-art-wall {
+  box-shadow:
+    0 30px 90px rgba(9, 13, 27, 0.24),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.collector-art-wall::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.24;
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+.collector-metric-tile,
+.collector-action-tile {
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.97), rgba(251, 252, 248, 0.92)),
+    linear-gradient(120deg, rgba(29, 78, 216, 0.08), transparent 46%);
+}
+
+.collector-nav-rail {
+  background:
+    linear-gradient(180deg, #080c19, #0d1221 62%, #151000);
+}
+
+.collector-topbar-inner,
+.collector-content {
+  min-width: 0;
+}
+
+@media (min-width: 1024px) {
+  .collector-topbar {
+    left: 6rem;
+    right: 0;
+  }
+}

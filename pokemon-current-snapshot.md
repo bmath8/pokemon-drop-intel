@@ -1,0 +1,36 @@
+- generic [active] [ref=e1] [box=0,0,1425,4615]:
+  - main [ref=e2] [box=0,0,1425,4615]:
+    - generic [ref=e4] [box=121,0,1280,64]:
+      - button "PokéVault Pro $3,526 tracked" [ref=e335] [box=153,14,161,37]:
+        - generic [ref=e10] [box=197,14,117,37]
+      - button "Search, scan, price, grade, or track a drop" [ref=e14] [box=583,9,448,46]: Search, scan, price, grade, or track a drop
+      - button "Scan" [ref=e16] [box=1300,10,68,44]
+    - complementary [ref=e17] [box=0,0,96,1000]:
+      - generic [ref=e18] [box=0,0,95,1000]:
+        - button [ref=e19] [box=24,16,48,48]
+        - button "Home" [ref=e24] [box=8,84,80,60]
+        - button "Bind" [ref=e28] [box=8,152,80,60]
+        - button "Cards" [ref=e32] [box=8,220,80,60]
+        - button "Scan" [ref=e36] [box=8,288,80,60]
+        - button "Card" [ref=e40] [box=8,356,80,60]
+        - button "Market" [ref=e44] [box=8,424,80,60]
+        - button "PSA" [ref=e47] [box=8,492,80,60]
+        - button "Drops" [ref=e51] [box=8,560,80,60]
+        - button "Watch" [ref=e54] [box=8,628,80,60]
+        - button "Setup" [ref=e57] [box=8,696,80,60]
+    - generic [ref=e62] [box=128,96,1216,4407]:
+      - generic [ref=e63] [box=136,96,860,4407]:
+        - generic [ref=e65] [box=136,96,860,730]
+        - generic [ref=e116] [box=136,846,860,913]
+        - generic [ref=e157] [box=136,1779,860,87]
+        - generic [ref=e167] [box=136,1885,860,368]
+        - generic [ref=e180] [box=136,2273,860,419]
+        - generic [ref=e230] [box=136,2711,860,1300]
+        - generic [ref=e255] [box=136,4031,860,472]
+      - generic [ref=e273] [box=1016,96,320,1157]:
+        - generic [ref=e274] [box=1016,96,320,294]
+        - generic [ref=e294] [box=1016,410,320,294]
+        - generic [ref=e314] [box=1016,724,320,529]
+  - button "Open Next.js Dev Tools" [ref=e342] [cursor=pointer] [box=22,946,32,32]:
+    - img [ref=e343] [box=22,942,40,40]
+  - alert [ref=e346] [box=-1,-1,1,1]
