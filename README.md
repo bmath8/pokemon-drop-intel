@@ -1,6 +1,6 @@
 ﻿# Pokémon Drop Intel
 
-> **Live demo:** _(deploying — link coming)_ · A local-first Pokémon TCG collection & drop-intelligence cockpit.
+> **Live demo:** https://pokemon-drop-intel.vercel.app · A local-first Pokémon TCG collection & drop-intelligence cockpit.
 > Built by Brian Mathew as an AI-assisted developer (Next.js 16 · React 19 · TypeScript · Tailwind 4).
 > The dashboard runs entirely on bundled sample data — **no account, login, or credentials needed** to explore it.
 
