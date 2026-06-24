@@ -16,6 +16,7 @@ export const metadata: Metadata = {
   title: "PokeVault Pro",
   description:
     "A premium Pokemon collector platform for portfolio tracking, scanning, market intelligence, grading workflows, marketplace watches, and drop alerts.",
+  robots: { index: false, follow: false },
 };
 
 export const viewport: Viewport = {
