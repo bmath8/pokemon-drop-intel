@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const CODE = process.env.SITE_PASSWORD || "brian2026";
+const CODE = process.env.SITE_PASSWORD;
 const COOKIE_NAME = "bm_access";
 
 export const config = {
@@ -14,7 +14,7 @@ export function middleware(req: NextRequest) {
   if (req.cookies.get(COOKIE_NAME)?.value === "granted") return NextResponse.next();
 
   const url = req.nextUrl.clone();
-  if (url.searchParams.get("code") === CODE) {
+  if (CODE && url.searchParams.get("code") === CODE) {
     url.searchParams.delete("code");
     const res = NextResponse.redirect(url, 302);
     res.cookies.set(COOKIE_NAME, "granted", { path: "/", maxAge: 2592000, sameSite: "lax" });
@@ -36,5 +36,7 @@ button:hover{opacity:.85}</style></head><body><div class="card">
 <form onsubmit="location.href='/?code='+encodeURIComponent(document.getElementById('c').value);return false">
 <input id="c" placeholder="access code" autofocus autocomplete="off"><button>Enter →</button></form>
 </div></body></html>`;
-  return new NextResponse(page, { status: 401, headers: { "Content-Type": "text/html; charset=utf-8" } });
+  // 200, not 401: a non-200 makes link-preview bots and corporate proxies treat
+  // this URL as dead. The page still gates; only the wire status changes.
+  return new NextResponse(page, { status: 200, headers: { "Content-Type": "text/html; charset=utf-8" } });
 }
