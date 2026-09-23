@@ -249,16 +249,87 @@ function decodeHeaderValue(value: string) {
 function decodeQuotedPrintable(text: string) {
   return text
     .replace(/=\r?\n/g, "")
-    .replace(/=([A-F0-9]{2})/gi, (_, hex: string) =>
-      String.fromCharCode(Number.parseInt(hex, 16)),
+    // Decode each run of =XX escapes as UTF-8 bytes so multi-byte characters
+    // (e.g. =E2=80=94 -> em dash) are reassembled instead of becoming mojibake.
+    .replace(/(?:=[A-F0-9]{2})+/gi, (run: string) =>
+      new TextDecoder().decode(
+        Uint8Array.from(run.match(/=[A-F0-9]{2}/gi) ?? [], (escape) =>
+          Number.parseInt(escape.slice(1), 16),
+        ),
+      ),
     );
 }
 
-function stripMultipartBoundary(text: string) {
-  return text
-    .split(/\r?\n--[^\r\n]+/g)[0]
-    .replace(/\r?\nContent-[^\r\n]+:.*(?:\r?\n[ \t].*)*/gi, "")
-    .trim();
+function decodeBase64(text: string) {
+  try {
+    const binary = atob(text.replace(/\s+/g, ""));
+    return new TextDecoder().decode(Uint8Array.from(binary, (char) => char.charCodeAt(0)));
+  } catch {
+    return text;
+  }
+}
+
+function decodeTransferEncoding(text: string, encoding: string) {
+  const lowered = encoding.toLowerCase();
+
+  if (lowered.includes("quoted-printable")) {
+    return decodeQuotedPrintable(text);
+  }
+
+  if (lowered.includes("base64")) {
+    return decodeBase64(text);
+  }
+
+  return text;
+}
+
+type MimePart = { text: string; transferEncoding: string };
+
+/**
+ * Pick the most readable part of a multipart body: text/plain first, then any text/*,
+ * recursing into nested multipart/* parts. Uses the boundary declared in Content-Type, so a
+ * MIME preamble ("This is a multi-part message...") and per-part headers are skipped.
+ */
+function extractPreferredMimePart(body: string, contentType: string, depth = 0): MimePart {
+  const boundaryMatch = contentType.match(/boundary="?([^";\s]+)"?/i);
+
+  if (!boundaryMatch || depth > 3) {
+    return { text: body, transferEncoding: "" };
+  }
+
+  const parts = body
+    .split(`--${boundaryMatch[1]}`)
+    .slice(1) // text before the first delimiter is the MIME preamble
+    .filter((part) => !part.startsWith("--")) // closing delimiter "--boundary--"
+    .map((part) => {
+      const withoutLeadingBreak = part.replace(/^\r?\n/, "");
+      const hasHeaders = !/^\r?\n/.test(withoutLeadingBreak);
+      const { headerBlock, bodyBlock } = hasHeaders
+        ? extractHeaderBlock(withoutLeadingBreak)
+        : { headerBlock: "", bodyBlock: withoutLeadingBreak };
+
+      return {
+        type: (extractHeaderValue(headerBlock, "Content-Type") ?? "text/plain").toLowerCase(),
+        rawType: extractHeaderValue(headerBlock, "Content-Type") ?? "",
+        transferEncoding: extractHeaderValue(headerBlock, "Content-Transfer-Encoding") ?? "",
+        text: bodyBlock.trim(),
+      };
+    });
+
+  const chosen =
+    parts.find((part) => part.type.startsWith("text/plain")) ??
+    parts.find((part) => part.type.startsWith("text/")) ??
+    parts.find((part) => part.type.startsWith("multipart/"));
+
+  if (!chosen) {
+    return { text: "", transferEncoding: "" };
+  }
+
+  if (chosen.type.startsWith("multipart/")) {
+    return extractPreferredMimePart(chosen.text, chosen.rawType, depth + 1);
+  }
+
+  return { text: chosen.text, transferEncoding: chosen.transferEncoding };
 }
 
 function extractHeaderBlock(rawEmail: string) {
@@ -278,7 +349,13 @@ function extractHeaderBlock(rawEmail: string) {
 }
 
 function extractHeaderValue(headerBlock: string, name: string) {
-  const regex = new RegExp(`^${name}:\\s*([\\s\\S]*?)(?:\\r?\\n[^ \\t]|$)`, "im");
+  // Capture the value up to the next unfolded line (or end of input) so RFC 5322 folded headers
+  // ("Subject: part one\r\n part two") are kept whole. The previous `|$` alternative matched at
+  // the end of the FIRST line under the `m` flag, truncating folded headers.
+  const regex = new RegExp(
+    `^${name}:[ \\t]*([\\s\\S]*?)(?=\\r?\\n(?![ \\t])|(?![\\s\\S]))`,
+    "im",
+  );
   const match = headerBlock.match(regex);
 
   if (!match) {
@@ -297,14 +374,15 @@ export function parseRawEmail(rawEmail: string): RawEmailParseResult {
     extractHeaderValue(headerBlock, "Content-Transfer-Encoding") ?? "";
 
   let normalizedBody = bodyBlock.trim();
+  let effectiveEncoding = transferEncoding;
 
   if (contentType.toLowerCase().includes("multipart/")) {
-    normalizedBody = stripMultipartBoundary(normalizedBody);
+    const part = extractPreferredMimePart(normalizedBody, contentType);
+    normalizedBody = part.text;
+    effectiveEncoding = part.transferEncoding || transferEncoding;
   }
 
-  if (transferEncoding.toLowerCase().includes("quoted-printable")) {
-    normalizedBody = decodeQuotedPrintable(normalizedBody);
-  }
+  normalizedBody = decodeTransferEncoding(normalizedBody, effectiveEncoding);
 
   const body = normalizeText(normalizedBody);
 
