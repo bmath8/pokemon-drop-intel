@@ -1,0 +1,10 @@
+# gitleaks config: default rules plus an allowlist for files checked on 2026-11-24
+# and found to hold no real secrets (test fixtures, cached data, public local-dev defaults).
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Reviewed false positives (2026-11-24)"
+paths = [
+  '''^app/_components/collector-app\.tsx$''',
+]
