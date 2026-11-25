@@ -1,0 +1,34 @@
+# Security fixes only, grouped into one PR per ecosystem. Version-bump PRs are off on purpose
+# (open-pull-requests-limit: 0); security updates ignore that limit. From brian-os-standards/ops.
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directories:
+      - "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 0
+    groups:
+      security-fixes:
+        applies-to: security-updates
+        patterns: ["*"]
+  - package-ecosystem: "pip"
+    directories:
+      - "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 0
+    groups:
+      security-fixes:
+        applies-to: security-updates
+        patterns: ["*"]
+  - package-ecosystem: "github-actions"
+    directories:
+      - "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 0
+    groups:
+      security-fixes:
+        applies-to: security-updates
+        patterns: ["*"]
